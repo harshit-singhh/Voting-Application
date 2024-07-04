@@ -4,6 +4,12 @@ const { generateToken } = require("../jwt");
 
 const registerUser = asyncHandler(async (req, res) => {
   const data = req.body;
+  const UserId = data.id;
+
+  const user = await User.findById(UserId);
+  if (user) {
+    throw new Error("user already exsist in database");
+  }
 
   const newUser = new User(data); // Create a new document of User with req.body data
 
@@ -15,7 +21,7 @@ const registerUser = asyncHandler(async (req, res) => {
   console.log("User data saved");
 
   const payload = {
-    id: response.id,
+    id: response._id,
   };
 
   console.log(JSON.stringify(payload));

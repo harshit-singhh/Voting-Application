@@ -18,6 +18,7 @@ const jwtAuthMiddleware = (req , res , next) => {
         const decodedPayload = jwt.verify(token, process.env.JWT_SECRET);
         
         req.user = decodedPayload;
+        // res.json({message : "authentication completed and payload sent"})
         next();
     }
     catch (error) {

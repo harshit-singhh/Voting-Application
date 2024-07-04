@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Candidate = require("../models/candidate"); 
-const { generateToken } = require("../jwt");
+const { generateToken, jwtAuthMiddleware } = require("../jwt");
 const User = require('../models/user');
 
 
@@ -48,7 +48,7 @@ const updateCandidate = asyncHandler(async (req, res) => {
     const CandidateId = req.params.candidateID;
     const updatedCandidateData = req.body;
 
-    const response = await personalbar.findByIdAndUpdate(CandidateId, updatedCandidateData, {
+    const response = await Candidate.findByIdAndUpdate(CandidateId, updatedCandidateData, {
         new: true, // return the updated document
         runValidators: true, // Run Mongoose validation
     });
@@ -89,14 +89,23 @@ const deleteCandidate = asyncHandler(async (req, res) => {
 
 })
 
+// =====================================================================
+
+const CandidatesList = asyncHandler(async (req, res) => {
+    
+    const result = await Candidate.find().sort({ voteCount: "desc" });
+
+    if (!result) {
+        throw new Error("no candidates found");
+    }
+
+    const candidateNames = result.map((data) => {
+        return { Name : data.name };
+    })
+
+    res.status(200).json({ candidateNames });
+})
 
 
 
-
-
-
-
-
-
-
-    module.exports = { addCandidate, updateCandidate , deleteCandidate };
+    module.exports = { addCandidate, updateCandidate , deleteCandidate , CandidatesList};
