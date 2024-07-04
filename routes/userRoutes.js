@@ -8,7 +8,7 @@ const { registerUser, authUser , ProfileData , ChangePassword} = require("../Con
 router.post("/signup", registerUser);
 router.post("/login", authUser);
 router.get("/profile", jwtAuthMiddleware, ProfileData);
-router.put("/profile/password", ChangePassword);
+router.put("/profile/password", jwtAuthMiddleware, ChangePassword);
 
 
 

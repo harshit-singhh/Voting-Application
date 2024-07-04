@@ -15,16 +15,22 @@ const registerUser = asyncHandler(async (req, res) => {
   console.log("User data saved");
 
   const payload = {
-    id: response._id,
+    id: response.id,
   };
 
   console.log(JSON.stringify(payload));
   const token = generateToken(payload);
   console.log("Token is: ", token);
 
+  // this is not working.. this is my doubt 
+  //  response.token = token;
+  
   // we could have also written res.status(200).json({response , token})
-  res.status(200).json({ response : response , token : token}); // Send response and token in JSON format
+  res.status(200).json({ response : response , token : token }); // Send response and token in JSON format
 });
+
+
+// ======================================================================
 
 
 const authUser = asyncHandler(async (req, res) => {
@@ -39,7 +45,7 @@ const authUser = asyncHandler(async (req, res) => {
   }
 
   const payload = {
-    id : user._id,
+    id: user._id,
 
   }
 
@@ -47,26 +53,64 @@ const authUser = asyncHandler(async (req, res) => {
 
   res.json({ token });
 
-})
+});
 
+// =======================================================================
 
 const ProfileData = asyncHandler(async (req, res) => {
   
   const userData = req.user;
-  const userId = userData._id;
+  const userId = userData.id;
 
   const user = await User.findOne(userId);
-  if (!user) {
-    throw new Error("Internal Server Error");
-  }
+
+  // no need to check this here, because user to hoga hi
+  // tabhi to authenticate hoke yha tak aaya he
+
+  // if (!user) {
+  //   throw new Error("Internal Server Error");
+  // }
+
   res.status(200).json({ user });
   
-})
+});
+
+
+// ============================================================================
 
 const ChangePassword = asyncHandler(async (req, res) => {
   
-  const userId = req.user._id;
+  const userId = req.user.id;
+
+  const { currentPassword, newPassword } = req.body;
+  // ye function me tabhi aaega user.. jab wo authenticated hoga
+  // and agar wo authenticated hoga then this means ki definetly
+  // wo server me registered hoga.
+
+  // therefore there is no need to check ki if that person is present 
+  // in databse or not
+
+  const user = await User.findById(userId);
+
+  if (!(await user.comparePassword(password))) {
+    res.status(401);
+    throw new Error("Invalid AadharNumber of Password");
+  }
+
+  user.password = newPassword;
+  const response = await user.save();
+  if (!response) {
+    res.status(500);
+    throw new Error("Internal Server Error");
+  }
+
+  console.log('password updated');
+  res.status(200).json({ message: "Password Updated Successfully" });
+
 });
+
+
+// =============================================================================
 
 
 module.exports = { registerUser, authUser , ProfileData , ChangePassword };

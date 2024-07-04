@@ -11,7 +11,7 @@ const jwtAuthMiddleware = (req , res , next) => {
     try {
         
         const decodedPayload = jwt.verify(token, process.env.JWT_SECRET);
-
+        
         req.user = decodedPayload;
         next();
     }
@@ -25,7 +25,7 @@ const jwtAuthMiddleware = (req , res , next) => {
 
 const generateToken = (userData) => {
     
-    return jwt.sign(useData, process.env.JWT_SECRET, { expiresIn: '30d' });
+    return jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: '30d' });
 }
 
 module.exports = { generateToken, jwtAuthMiddleware };
