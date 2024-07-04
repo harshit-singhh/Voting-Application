@@ -2,7 +2,12 @@ const jwt = require('jsonwebtoken');
 
 const jwtAuthMiddleware = (req , res , next) => {
     
-    const token = req.headers.authorization.split(' ')[1];
+    const tokenPresent = req.headers.authorization;
+    if (!tokenPresent) {
+        res.status(404);
+        throw new Error("token is not present for authentication");
+    }
+    const token = tokenPresent.split(' ')[1];
 
     if (!token) {
         return res.status(401).json({ error: 'Token Not found' });

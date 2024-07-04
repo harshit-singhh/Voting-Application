@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const Candidate = require("../models/candidate"); // Import User model only once
+const Candidate = require("../models/candidate"); 
 const { generateToken } = require("../jwt");
 const User = require('../models/user');
 
@@ -19,7 +19,7 @@ const checkAdminRole = async (userId) => {
 
 const addCandidate = asyncHandler(async (req, res) => {
     
-    if (!checkAdminRole(req.user.id)) {
+    if (!(await checkAdminRole(req.user.id))) {
         return res.status(403).json({ message: "User does not have admin role"});
     }
 
@@ -28,6 +28,9 @@ const addCandidate = asyncHandler(async (req, res) => {
     const newCandidate = new Candidate(data);
 
     const response = await newCandidate.save();
+    if (!response) {
+        throw new Error("Internal Server Error");
+    }
     console.log('Candidate data saved');
     res.status(200).json({ response: response });
 })
@@ -36,9 +39,11 @@ const addCandidate = asyncHandler(async (req, res) => {
 
 
 const updateCandidate = asyncHandler(async (req, res) => {
-    if (!checkAdminRole(req.user.id)) {
-      return res.status(403).json({ message: "User does not have admin role" });
-    }
+     if (!(await checkAdminRole(req.user.id))) {
+       return res
+         .status(403)
+         .json({ message: "User does not have admin role" });
+     }
 
     const CandidateId = req.params.candidateID;
     const updatedCandidateData = req.body;
@@ -57,10 +62,15 @@ const updateCandidate = asyncHandler(async (req, res) => {
     res.status(200).json({ response });
 })
 
+
+// ========================================================================
+
 const deleteCandidate = asyncHandler(async (req, res) => {
-    if (!checkAdminRole(req.user.id)) {
-        return res.status(403).json({ message: "User does not have admin role" });
-    }
+     if (!(await checkAdminRole(req.user.id))) {
+       return res
+         .status(403)
+         .json({ message: "User does not have admin role" });
+     }
 
      const CandidateId = req.params.candidateID;
 
@@ -78,5 +88,15 @@ const deleteCandidate = asyncHandler(async (req, res) => {
 
 
 })
+
+
+
+
+
+
+
+
+
+
 
     module.exports = { addCandidate, updateCandidate , deleteCandidate };

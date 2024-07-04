@@ -22,7 +22,7 @@ app.use("/user", userRoutes);
 // hum candidates wali api call me yha se hi authentication mandatory
 // kar rhe he because..ye wala route hum chahte whi access kar pae
 // jo authenticated ho, mtlb jiska pehle se database me data ho (admin)
-app.use("/candidates", jwtAuthMiddleware, candidateRoutes);
+app.use("/candidate", jwtAuthMiddleware, candidateRoutes);
 
 // Custom error handling middleware
 app.use(notFound);
