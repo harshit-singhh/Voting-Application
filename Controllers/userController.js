@@ -4,11 +4,25 @@ const { generateToken } = require("../jwt");
 
 const registerUser = asyncHandler(async (req, res) => {
   const data = req.body;
-  const UserId = data.id;
+  
+  const Admin = await User.findOne({ role: 'admin' });
+  if (Admin && data.role === "admin") {
+      throw new Error("Admin user already exists");
+  }
 
-  const user = await User.findById(UserId);
-  if (user) {
-    throw new Error("user already exsist in database");
+    // to check if aadhar number is only 12 digits long
+  if (!/^\d{12}$/.test(data.aadharCardNumber)) {
+    return res
+      .status(400)
+      .json({ error: "Aadhar Card Number must be exactly 12 digits" });
+  }
+
+  const ExistingUser = await User.findOne({
+    aadharCardNumber: data.aadharCardNumber,
+  });
+
+  if (ExistingUser) {
+    throw new Error("user already exists in database");
   }
 
   const newUser = new User(data); // Create a new document of User with req.body data
